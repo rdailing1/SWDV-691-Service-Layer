@@ -50,7 +50,7 @@ var executeQuery = function(res, query) {
     Ex: http://localhost:8081/group/
 */
 app.get('/group/:email', function (req, res) {
-    var query = 'SELECT DISTINCT [Group] FROM dbo.[Group] g INNER JOIN dbo.WishList wl ON g.[Group] = wl.UserGroup INNER JOIN dbo.UserProfile up ON wl.UserID = up.ID WHERE up.Email = \'' + req.params.email + '\'';
+    var query = 'SELECT DISTINCT [Group] FROM dbo.UserGroups ug INNER JOIN dbo.UserProfile up ON ug.UserID = up.ID WHERE up.Email = \'' + req.params.email + '\'';
     executeQuery (res, query);
 })
 
@@ -77,7 +77,7 @@ app.get('/UserLogin/:email/:pwd', function (req, res) {
 
 /*
     Select query on the UserProfile table (with different name for security) for profile data queries
-    Ex: http://localhost:8081/UserData/
+    Ex: http://localhost:8081/UserData/rldail@earthlink.net
 */
 app.get('/UserData/:email', function (req, res) {
     var query = 'SELECT Name, Password FROM dbo.UserProfile WHERE Email = \'' + req.params.email + '\'';
@@ -87,7 +87,7 @@ app.get('/UserData/:email', function (req, res) {
 
 /*
     Select query on the Relationship_View view (with different name for security) for profile data queries
-    Ex: http://localhost:8081/relate/
+    Ex: http://localhost:8081/relate/rldail@earthlink.net/'BJC%20Christmas'
 */
 app.get('/relate/:email/:group', function (req, res) {
     var query = 'SELECT Related, Relationship FROM dbo.Relationship_View WHERE Email = \'' + req.params.email + '\' AND [Group] = ' + req.params.group;
@@ -97,7 +97,7 @@ app.get('/relate/:email/:group', function (req, res) {
 
 /*
     Select query on the WishList table
-    Ex: http://localhost:8081/mywl/
+    Ex: http://localhost:8081/mywl/rldail@earthlink.net/'BJC%20Christmas'
 */
 app.get('/mywl/:email/:group', function (req, res) {
     var query = 'SELECT Name, Item FROM dbo.WishList wl INNER JOIN dbo.UserProfile up ON wl.UserID = up.ID WHERE Email = \'' + req.params.email + '\' AND UserGroup = ' + req.params.group;
@@ -105,77 +105,32 @@ app.get('/mywl/:email/:group', function (req, res) {
 })
 
 
+/*
+    Update query on the UserProfile table
+    Ex: http://localhost:8081/UserUpdate/rldail@earthlink.net/Randy%20Dailing/Randy/test123
+*/
+app.put('/UserUpdate/:email/:name/:pwd', function (req, res) {
+    var query = 'UPDATE dbo.UserProfile SET Name = \'' + req.params.name + '\', Password = \'' + req.params.pwd + '\'  WHERE Email = \'' + req.params.email + '\'';
+    executeQuery (res, query);
+})
 
 
-
-// app.put('/UserUpdate/:email', function (req, res, next) {
-//     sql.connect(sqlConfig, function() {
-//         var request = new sql.Request();
-//         var stringRequest = 'UPDATE dbo.UserProfile SET Name = 1234 WHERE Email = \'cmdail@earthlink.net\'';
-//         request.query(stringRequest, function(err, recordset) {
-//             if(err) console.log(err);
-//             res.end(JSON.stringify(recordset)); // Result in JSON format
-//         });
-//     });
-// })
-
-// app.put("/api/user/:id", function(req , res, next){
-//     // req.body is the body of the request
-//     // req.query is the query parameters in the URL ( like ?firstname=1 )
-//     var query = "UPDATE TestTable SET firstname= " + req.body.firstname  +  "   WHERE Id= " + req.params.id;
-//     executeQuery (res, query);
-// });
+/*
+    Delete the user's wishlist item for the group
+    Ex: http://localhost:8081/wlUpdate/rldail@earthlink.net/'BJC%20Christmas'
+*/
+app.post('/wlDelete/:email/:group/:item', function (req, res) {
+    var query = 'DELETE FROM dbo.WishList FROM dbo.WishList wl INNER JOIN dbo.UserProfile u ON wl.UserID = u.ID INNER JOIN dbo.[Group] g ON wl.UserGroup = g.[Group] WHERE Email = \'' + req.params.email + '\' AND [Group] = ' + req.params.group + ' AND Item = \'' + req.params.item + '\'';
+    executeQuery (res, query);
+})
 
 
+/*
+    Insert new values into the user's wishlist items for the group
+    Ex: http://localhost:8081/wlUpdate/rldail@earthlink.net/'BJC%20Christmas'/'item'
+*/
+app.post('/wlInsert/:email/:group/:item', function (req, res) {
+    var query = 'INSERT INTO dbo.WishList (UserID, UserGroup, Item, Purchased) SELECT u.ID, ' + req.params.group + ', ' + req.params.item + ', 0 FROM dbo.UserProfile AS u WHERE Email = \'' + req.params.email + '\'';
+    executeQuery (res, query);
+})
 
-
-
-
-// function getEmployeeFromRec(req) {
-//     const employee = {
-//       first_name: req.body.first_name,
-//       last_name: req.body.last_name,
-//       email: req.body.email,
-//       phone_number: req.body.phone_number,
-//       hire_date: req.body.hire_date,
-//       job_id: req.body.job_id,
-//       salary: req.body.salary,
-//       commission_pct: req.body.commission_pct,
-//       manager_id: req.body.manager_id,
-//       department_id: req.body.department_id
-//     };
-   
-//     return employee;
-// }
-
-// async function post(req, res, next) {
-//     try {
-//       let employee = getEmployeeFromRec(req);
-   
-//       employee = await employees.create(employee);
-   
-//       res.status(201).json(employee);
-//     } catch (err) {
-//       next(err);
-//     }
-// }
-
-// async function put(req, res, next) {
-//   try {
-//     let employee = getEmployeeFromRec(req);
- 
-//     employee.employee_id = parseInt(req.params.id, 10);
- 
-//     employee = await employees.update(employee);
- 
-//     if (employee !== null) {
-//       res.status(200).json(employee);
-//     } else {
-//       res.status(404).end();
-//     }
-//   } catch (err) {
-//     next(err);
-//   }
-// }
- 
-// module.exports.put = put;
