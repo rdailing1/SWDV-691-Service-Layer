@@ -19,3 +19,16 @@ PRIMARY KEY CLUSTERED
 ) ON [PRIMARY]
 GO
 
+INSERT INTO UserGroups values (2, 'Fischer Christmas')
+INSERT INTO UserGroups values (2, 'Dailing Christmas')
+INSERT INTO UserGroups values (3, 'Fischer Christmas')
+INSERT INTO UserGroups values (3, 'Dailing Christmas')
+INSERT INTO UserGroups values (4, 'Fischer Christmas')
+INSERT INTO UserGroups values (4, 'Dailing Christmas')
+INSERT INTO UserGroups values (5, 'Dailing Christmas')
+INSERT INTO UserGroups values (6, 'Dailing Christmas')
+INSERT INTO UserGroups values (7, 'Fischer Christmas')
+INSERT INTO UserGroups values (8, 'Fischer Christmas')
+INSERT INTO UserGroups values (9, 'BJC Christmas')
+INSERT INTO UserGroups values (10, 'BJC Christmas')
+INSERT INTO UserGroups values (11, 'BJC Christmas')
